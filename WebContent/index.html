@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>学生信息添加</title>
+<style type="text/css">
+*{
+	font-size: 14px;
+}
+li {
+	list-style-type: none;
+	margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<form id="myform" onsubmit="return add()">
+<ul>
+	<li><label>班级：
+	<select id="cid" name="cid">
+		<option value="0">--请选择--</option>
+	</select>
+	</label></li>
+	<li><label>姓名：<input type="text" id="sname" name="sname"/></label></li>
+	<li><label>年龄：<input type="number" id="age" name="age"/></label></li>
+	<li><label>联系方式：<input type="tel" id="tel" name="tel"/></label></li>
+	<li><label>住址：<input type="text" id="addr" name="addr"/></label></li>
+	<li><label>生日：<input type="date" id="birth" name="birth" /></label></li>
+	<li><label>图像：<input type="file" id="photo" name="photo" accept="image/gif,image/jpeg" multiple="multiple" onchange="setImagePreviews(this,'show_pic')"/></label></li>
+	<li><div id="show_pic"></div></li>
+	<li><label>文件：<input type="file" id="myfile" name="myfile" multiple="multiple"/></label></li>
+	<li><input type="submit" value="添加" />
+</ul>
+</form>
+<h1><a href="show.html">浏览学生信息</a></h1>
+<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+<script type="text/javascript" src="js/showpic.js"></script>
+<script type="text/javascript" src="js/ajaxfileupload.js"></script>
+<script type="text/javascript">
+$(function(){
+	
+	$.post("cls",{op:"findAll"},data=>{
+		var str="";
+		$.each(data,function(index,item){
+			str +="<option value='"+item.cid+"'>"+"</option>";
+			
+		})
+		$("#cid").append($(str));
+	},"json");
+	
+})
+
+function add(){
+	var cid=$.trim($("#cid").val());
+	var sname=$.trim($("#sname").val());
+	var age=$.trim($("#age").val());
+	var tel=$.trim($("#tel").val());
+	var addr=$.trim($("#addr").val());
+	var birth=$.trim($("#birth").val());
+	
+	$.ajaxFileUpload({
+		url:"stu?op=add",
+		secureuri:false,
+		fileElementId:["photo","myfile"],//要上传的文件对应的id值，如果只有一个fileElementId:"photos"
+		dataType:"json",
+		data:{cid:cid,sname:sname,age:age,tel:tel,addr:addr,birth:birth},
+		success: function(data,status){
+			data=parseInt($.trim(data));
+			if(data==-1){
+				alert("您输入的信息不完整...");
+			}else if(data>0){
+				$("#myform")[0].reset();
+				$("#show_pic").html("");
+				alert("添加成功...");
+			}else{
+				alert("添加失败...");
+			}
+		},
+		error:function(data,status,e){
+			alert("添加学生信息失败...\n"+e);
+		}
+	})
+	
+	
+}
+</script>
+</body>
+</html>
